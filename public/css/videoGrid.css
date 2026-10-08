@@ -1,0 +1,1113 @@
+/*--------------------------------------------------------------
+# Video grid
+--------------------------------------------------------------*/
+
+#videoMediaContainer {
+    z-index: 2;
+    position: absolute;
+    display: flex;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    opacity: 1;
+    align-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    overflow: hidden;
+    transition: opacity 500ms;
+}
+
+/* Video container with mouse light effect */
+#videoMediaContainer.mouse-light {
+    background:
+        radial-gradient(
+            1024px 1024px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0.18) 20%,
+            rgba(255, 255, 255, 0.08) 40%,
+            rgba(0, 0, 0, 0) 60%,
+            rgba(0, 0, 0, 0.1) 80%,
+            rgba(0, 0, 0, 0.25) 100%
+        ),
+        var(--body-bg, linear-gradient(135deg, #222, #444));
+    background-blend-mode: multiply, normal;
+    transition: background 0.2s;
+}
+
+#videoPinMediaContainer {
+    z-index: 1;
+    position: absolute;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 75%;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    /* border: 3px solid lime; */
+}
+
+.Camera,
+.Screen {
+    position: relative;
+    vertical-align: middle;
+    align-self: center;
+    border-radius: 10px;
+    overflow: hidden;
+    display: inline-block;
+    background: var(--body-bg);
+    border: var(--elem-border-color);
+    box-shadow: var(--box-shadow);
+    border-radius: 10px;
+    container-type: inline-size;
+    container-name: camera;
+    animation: show 0.4s ease;
+}
+
+.video-loading-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9;
+    background: var(--body-bg);
+}
+
+/*--------------------------------------------------------------
+# Video nav Bar
+--------------------------------------------------------------*/
+
+.navbar {
+    z-index: 8;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    background: var(--navbar-bg);
+    text-align: right;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 6px 12px 6px 6px;
+    gap: 4px;
+    row-gap: 4px;
+    box-sizing: border-box;
+}
+
+.navbar button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    border: none;
+    border-radius: 10px;
+    background: var(--body-bg);
+    color: #fff;
+    margin: 3px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+    transform-origin: center;
+}
+
+.navbar button:hover {
+    background: var(--btns-bg-color) !important;
+    cursor: pointer;
+}
+
+#videoPinMediaContainer .navbar {
+    padding: 5px 10px 5px 5px;
+    gap: 3px;
+}
+
+#videoPinMediaContainer .navbar button {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 8px;
+    margin: 2px;
+    font-size: 0.8rem;
+}
+
+.navbar div {
+    display: inline;
+}
+
+.video-drawing-canvas {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.video-drawing-canvas.video-drawing-active {
+    pointer-events: auto;
+}
+
+.video-drawing-canvas.video-drawing-selecting {
+    cursor: default;
+}
+
+.video-drawing-annotations-hidden .video-drawing-canvas,
+.video-drawing-annotations-hidden .video-drawing-text-annotation,
+.video-drawing-readonly .video-drawing-text-annotation > button {
+    display: none !important;
+}
+
+.video-drawing-erasing .video-drawing-text-annotation,
+.video-drawing-erasing .video-drawing-text-annotation *,
+.video-drawing-readonly .video-drawing-text-annotation,
+.video-drawing-readonly .video-drawing-text-annotation * {
+    pointer-events: none !important;
+}
+
+.video-drawing-erasing .video-drawing-canvas {
+    cursor: cell;
+}
+
+.navbar button.video-drawing-tool-active {
+    color: #4caf50;
+}
+
+.video-drawing-toolbar {
+    position: absolute;
+    z-index: 9;
+    top: 48px;
+    left: 50%;
+    display: none !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100% - 16px);
+    padding: 4px;
+    border: var(--border);
+    border-radius: 8px;
+    background: var(--body-bg);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    transform: translateX(-50%);
+}
+
+.video-drawing-toolbar-primary {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 3px;
+}
+
+.video-drawing-toolbar-panel {
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    max-width: 100%;
+    max-height: 132px;
+    overflow-y: auto;
+    padding: 6px 0 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    border-right: 0;
+}
+
+.video-drawing-toolbar-panel[hidden] {
+    display: none;
+}
+
+.video-drawing-toolbar-group {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 3px;
+    padding-right: 3px;
+    border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.video-drawing-toolbar.video-drawing-toolbar-active {
+    display: flex !important;
+}
+
+.video-drawing-toolbar.video-drawing-toolbar-collapsed {
+    display: none !important;
+}
+
+.video-drawing-toolbar button {
+    display: inline-flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+.video-drawing-toolbar button:hover,
+.video-drawing-toolbar button:focus-visible {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.video-drawing-toolbar button.video-drawing-tool-active,
+.video-drawing-toolbar button[aria-expanded='true'] {
+    background: rgba(76, 175, 80, 0.22);
+    box-shadow: inset 0 0 0 2px #4caf50;
+    color: #4caf50;
+}
+
+.video-drawing-toolbar button:focus-visible,
+.video-drawing-toolbar input:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+}
+
+.video-drawing-toolbar button.fa-lock {
+    color: #ef5350;
+}
+
+.video-drawing-toolbar button:disabled {
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+.video-drawing-toolbar .video-drawing-drag-handle {
+    cursor: move;
+}
+
+.video-drawing-toolbar .video-drawing-diamond::before {
+    transform: rotate(45deg);
+}
+
+.video-drawing-toolbar button.video-drawing-close {
+    z-index: 1;
+    flex-shrink: 0;
+    background: var(--body-bg);
+}
+
+.video-drawing-toolbar button.video-drawing-delete:not(:disabled):hover,
+.video-drawing-toolbar button.video-drawing-delete:not(:disabled):focus-visible,
+.video-drawing-toolbar button.video-drawing-clear:not(:disabled),
+.video-drawing-toolbar button.video-drawing-exit {
+    color: #ef5350 !important;
+}
+
+.video-drawing-color {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    padding: 3px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.video-drawing-color::-webkit-color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+}
+
+.video-drawing-swatch span,
+.video-drawing-appearance span {
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+}
+
+.video-drawing-swatch[aria-pressed='true'] span {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+
+.video-drawing-width {
+    width: 96px;
+    accent-color: #4caf50;
+    cursor: pointer;
+}
+
+.video-drawing-width-preview {
+    flex: 0 0 32px;
+    width: 32px;
+    border-radius: 3px;
+}
+
+@container camera (max-width: 720px) {
+    .video-drawing-toolbar {
+        top: 48px !important;
+        left: 50% !important;
+        width: min(536px, calc(100% - 16px));
+        transform: translateX(-50%) !important;
+    }
+
+    .video-drawing-toolbar .video-drawing-drag-handle {
+        display: none;
+    }
+
+    .video-drawing-toolbar button,
+    .video-drawing-toolbar .video-drawing-color {
+        flex: 0 0 44px;
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@container camera (max-width: 540px) {
+    .video-drawing-toolbar-primary {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .video-drawing-toolbar-primary > .video-drawing-toolbar-group {
+        display: contents;
+    }
+
+    .video-drawing-toolbar-primary button {
+        width: 100%;
+        min-width: 0;
+        height: 44px;
+    }
+}
+
+@container camera (max-width: 320px) {
+    .video-drawing-toolbar {
+        padding: 2px;
+    }
+
+    .video-drawing-toolbar-primary {
+        gap: 0;
+    }
+}
+
+@container camera (max-width: 280px) {
+    .video-drawing-toolbar-primary {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+.video-drawing-text-editor {
+    position: absolute;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-sizing: border-box;
+    min-width: 160px;
+    max-width: calc(100% - 16px);
+    padding: 5px;
+    border: 2px solid #4caf50;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.86);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.42);
+    overflow: auto;
+    resize: horizontal;
+}
+
+.video-drawing-text-editor-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.video-drawing-text-formatting {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    touch-action: pan-x;
+}
+
+.video-drawing-text-appearance,
+.video-drawing-text-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 3px;
+    padding-left: 5px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.video-drawing-text-editor-controls button,
+.video-drawing-text-editor-controls input,
+.video-drawing-text-editor-controls select,
+.video-drawing-text-more-panel button,
+.video-drawing-text-more-panel input,
+.video-drawing-text-more-panel select {
+    box-sizing: border-box;
+    height: 30px;
+    border: 0;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.video-drawing-text-editor-controls button,
+.video-drawing-text-more-panel button {
+    flex: 0 0 30px;
+    width: 30px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.video-drawing-text-editor-controls button:hover,
+.video-drawing-text-editor-controls button:focus-visible,
+.video-drawing-text-editor-controls button[aria-pressed='true'],
+.video-drawing-text-editor-controls button[aria-expanded='true'],
+.video-drawing-text-more-panel button:hover,
+.video-drawing-text-more-panel button:focus-visible,
+.video-drawing-text-more-panel button[aria-pressed='true'] {
+    background: rgba(255, 255, 255, 0.22);
+    color: #81c784;
+}
+
+.video-drawing-text-editor-controls button:focus-visible,
+.video-drawing-text-more-panel button:focus-visible {
+    outline: 2px solid #81c784;
+    outline-offset: -2px;
+}
+
+.video-drawing-text-editor-controls button[aria-pressed='true'],
+.video-drawing-text-more-panel button[aria-pressed='true'] {
+    box-shadow: inset 0 -2px #81c784;
+}
+
+.video-drawing-text-more-panel {
+    position: absolute;
+    right: 5px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 240px;
+    max-width: calc(100% - 10px);
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    background: #202020;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
+}
+
+.video-drawing-text-more-panel[hidden] {
+    display: none;
+}
+
+.video-drawing-text-more-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    color: #fff;
+    font-size: 12px;
+}
+
+.video-drawing-text-background-controls {
+    display: flex;
+    gap: 3px;
+}
+
+.video-drawing-text-background-color:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.video-drawing-text-color,
+.video-drawing-text-background-color {
+    flex: 0 0 32px;
+    width: 32px;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.video-drawing-text-size,
+.video-drawing-text-rotation {
+    flex: 0 0 auto;
+    min-width: 62px;
+    padding: 0 5px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.video-drawing-text-editor-controls .video-drawing-text-cancel:hover,
+.video-drawing-text-editor-controls .video-drawing-text-cancel:focus-visible {
+    color: #ef5350;
+}
+
+.video-drawing-text-editor-controls .video-drawing-text-save {
+    background: #2e7d32;
+}
+
+.video-drawing-text-editor-controls .video-drawing-text-save:hover,
+.video-drawing-text-editor-controls .video-drawing-text-save:focus-visible {
+    background: #388e3c;
+    color: #fff;
+}
+
+.video-drawing-text-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 96px;
+    max-height: 180px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 4px;
+    outline: none;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    resize: none;
+}
+
+.video-drawing-text-input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.video-drawing-text-annotation {
+    --video-drawing-annotation-scale: 1;
+    position: absolute;
+    z-index: 8;
+    box-sizing: border-box;
+    min-height: calc(32px * var(--video-drawing-annotation-scale));
+    border: 1px solid transparent;
+    border-radius: calc(6px * var(--video-drawing-annotation-scale));
+    background: transparent;
+    box-shadow: none;
+    transform-origin: center;
+    color: var(--video-drawing-text-color, #fff);
+    font-size: calc(14px * var(--video-drawing-annotation-scale));
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    pointer-events: auto;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+    touch-action: none;
+    user-select: none;
+}
+
+.video-drawing-text-content {
+    display: block;
+    padding: calc(7px * var(--video-drawing-annotation-scale)) calc(78px * var(--video-drawing-annotation-scale))
+        calc(7px * var(--video-drawing-annotation-scale)) calc(9px * var(--video-drawing-annotation-scale));
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+    white-space: pre-wrap;
+}
+
+.video-drawing-text-bold {
+    font-weight: 700;
+}
+
+.video-drawing-text-italic {
+    font-style: italic;
+}
+
+.video-drawing-text-underline > .video-drawing-text-content {
+    text-decoration-line: underline;
+}
+
+.video-drawing-text-strikethrough > .video-drawing-text-content {
+    text-decoration-line: line-through;
+}
+
+.video-drawing-text-underline.video-drawing-text-strikethrough > .video-drawing-text-content {
+    text-decoration-line: underline line-through;
+}
+
+.video-drawing-text-has-background {
+    background: var(--video-drawing-text-background);
+}
+
+.video-drawing-text-annotation:not(.video-drawing-text-manageable) > .video-drawing-text-content {
+    padding-right: calc(9px * var(--video-drawing-annotation-scale));
+}
+
+.video-drawing-text-author {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    bottom: calc(100% + 4px);
+    width: max-content;
+    max-width: 200px;
+    padding: 4px 7px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.9);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: calc(11px * var(--video-drawing-annotation-scale));
+    font-weight: 500;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(2px);
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease;
+}
+
+.video-drawing-text-author-below > .video-drawing-text-author {
+    top: calc(100% + 4px);
+    bottom: auto;
+}
+
+.video-drawing-text-author-align-right > .video-drawing-text-author {
+    right: 0;
+    left: auto;
+}
+
+.video-drawing-text-annotation:hover > .video-drawing-text-author,
+.video-drawing-text-annotation:focus-visible > .video-drawing-text-author,
+.video-drawing-text-annotation:focus-within > .video-drawing-text-author {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.video-drawing-text-annotation:hover,
+.video-drawing-text-annotation:focus,
+.video-drawing-text-annotation:focus-visible,
+.video-drawing-text-annotation:focus-within,
+.video-drawing-text-dragging {
+    z-index: 10;
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(0, 0, 0, 0.72);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.32);
+}
+
+.video-drawing-text-has-background:hover,
+.video-drawing-text-has-background:focus,
+.video-drawing-text-has-background:focus-visible,
+.video-drawing-text-has-background:focus-within,
+.video-drawing-text-has-background.video-drawing-text-dragging {
+    background: var(--video-drawing-text-background);
+}
+
+.video-drawing-text-selected {
+    outline: 2px dashed #4caf50;
+    outline-offset: 2px;
+}
+
+.video-drawing-text-select-mode {
+    cursor: move;
+}
+
+.video-drawing-text-manageable {
+    cursor: grab;
+}
+
+.video-drawing-text-editing {
+    visibility: hidden;
+}
+
+.video-drawing-text-dragging {
+    cursor: grabbing;
+}
+
+.video-drawing-text-edit,
+.video-drawing-text-duplicate,
+.video-drawing-text-delete {
+    position: absolute;
+    top: calc(3px * var(--video-drawing-annotation-scale));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(24px * var(--video-drawing-annotation-scale));
+    height: calc(24px * var(--video-drawing-annotation-scale));
+    padding: 0;
+    border: 0;
+    border-radius: calc(4px * var(--video-drawing-annotation-scale));
+    background: transparent;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: calc(12px * var(--video-drawing-annotation-scale));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    cursor: pointer;
+}
+
+.video-drawing-text-annotation:hover > .video-drawing-text-edit,
+.video-drawing-text-annotation:hover > .video-drawing-text-duplicate,
+.video-drawing-text-annotation:hover > .video-drawing-text-delete,
+.video-drawing-text-annotation:focus > .video-drawing-text-edit,
+.video-drawing-text-annotation:focus > .video-drawing-text-duplicate,
+.video-drawing-text-annotation:focus > .video-drawing-text-delete,
+.video-drawing-text-annotation:focus-within > .video-drawing-text-edit,
+.video-drawing-text-annotation:focus-within > .video-drawing-text-duplicate,
+.video-drawing-text-annotation:focus-within > .video-drawing-text-delete {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-drawing-text-edit {
+    right: calc(51px * var(--video-drawing-annotation-scale));
+}
+
+.video-drawing-text-duplicate {
+    right: calc(27px * var(--video-drawing-annotation-scale));
+}
+
+.video-drawing-text-delete {
+    right: calc(3px * var(--video-drawing-annotation-scale));
+}
+
+.video-drawing-text-edit:hover,
+.video-drawing-text-edit:focus-visible {
+    background: rgba(76, 175, 80, 0.24);
+    color: #fff;
+}
+
+.video-drawing-text-duplicate:hover,
+.video-drawing-text-duplicate:focus-visible {
+    background: rgba(66, 165, 245, 0.24);
+    color: #fff;
+}
+
+.video-drawing-text-delete:hover,
+.video-drawing-text-delete:focus-visible {
+    background: rgba(255, 82, 82, 0.24);
+    color: #fff;
+}
+
+/* Dropdown overrides - must beat .navbar div */
+.navbar div.navbar-dropdown-content {
+    display: none !important;
+}
+
+.navbar div.navbar-dropdown-item {
+    display: flex !important;
+}
+
+/* Extra small containers (mobile portrait, small screens) */
+@container camera (max-width: 250px) {
+    .navbar {
+        padding: 4px 10px 4px 4px;
+        gap: 3px;
+        row-gap: 3px;
+    }
+    .navbar button {
+        font-size: 0.5rem;
+        padding: 6px;
+        min-width: 28px;
+        min-height: 28px;
+        margin: 1px;
+    }
+}
+
+/* Small containers (mobile portrait) */
+@container camera (min-width: 251px) and (max-width: 350px) {
+    .navbar {
+        padding: 5px 10px 5px 5px;
+        gap: 3px;
+        row-gap: 3px;
+    }
+    .navbar button {
+        font-size: 0.5rem;
+        padding: 7px;
+        min-width: 30px;
+        min-height: 30px;
+        margin: 1.5px;
+    }
+}
+
+/* Medium-small containers (mobile landscape, small tablets) */
+@container camera (min-width: 351px) and (max-width: 500px) {
+    .navbar {
+        padding: 6px 11px 6px 6px;
+        gap: 4px;
+        row-gap: 4px;
+    }
+    .navbar button {
+        font-size: 0.7rem;
+        padding: 8px;
+        min-width: 32px;
+        min-height: 32px;
+        margin: 2px;
+    }
+}
+
+@container camera (max-width: 500px) {
+    .navbar-session-time,
+    .navbar > .navbar-secondary-action {
+        display: none !important;
+    }
+
+    .navbar button {
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 0.75rem;
+    }
+}
+
+@container camera (max-width: 250px) {
+    .navbar > .navbar-compact-action {
+        display: none !important;
+    }
+}
+
+/* Medium containers (tablets portrait) */
+@container camera (min-width: 501px) and (max-width: 700px) {
+    .navbar {
+        padding: 6px 12px 6px 6px;
+        gap: 4px;
+        row-gap: 4px;
+    }
+    .navbar button {
+        font-size: 0.8rem;
+        padding: 9px;
+        min-width: 34px;
+        min-height: 34px;
+        margin: 2px;
+    }
+}
+
+/* Large containers (tablets landscape, desktop) */
+@container camera (min-width: 701px) and (max-width: 900px) {
+    .navbar {
+        padding: 7px 13px 7px 7px;
+        gap: 5px;
+        row-gap: 5px;
+    }
+    .navbar button {
+        font-size: 0.9rem;
+        padding: 9.5px;
+        min-width: 36px;
+        min-height: 36px;
+        margin: 2px;
+    }
+}
+
+/* Extra large containers (large desktop) */
+@container camera (min-width: 901px) {
+    .navbar {
+        padding: 8px 14px 8px 8px;
+        gap: 6px;
+        row-gap: 6px;
+    }
+    .navbar button {
+        font-size: 1rem;
+        padding: 10px;
+        min-width: 38px;
+        min-height: 38px;
+        margin: 3px;
+    }
+}
+
+/*--------------------------------------------------------------
+# Navbar dropdown menu
+--------------------------------------------------------------*/
+
+.navbar-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar-dropdown-content {
+    display: none !important;
+    position: fixed;
+    z-index: 9999;
+    min-width: 180px;
+    background: var(--body-bg);
+    border-radius: 10px;
+    border: var(--border);
+    padding: 6px 0;
+    box-shadow: var(--box-shadow);
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.navbar-dropdown-content.show {
+    display: block !important;
+}
+
+.navbar-dropdown-item {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+
+.navbar-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-dropdown-item button,
+.navbar .navbar-dropdown-item button,
+.navbar .navbar-dropdown-content .navbar-dropdown-item button {
+    pointer-events: none;
+    background: none !important;
+    border: none !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: 20px !important;
+    min-height: auto !important;
+    flex-shrink: 0;
+    border-radius: 0 !important;
+    box-sizing: content-box;
+    transform: none !important;
+}
+
+.navbar-dropdown-item button:hover,
+.navbar .navbar-dropdown-item button:hover {
+    background: none !important;
+    transform: none !important;
+}
+
+.navbar-dropdown-item span {
+    flex: 1;
+}
+
+.navbar-dropdown-control input[type='range'] {
+    width: 88px;
+    max-width: 40vw;
+    accent-color: var(--hover-color);
+    cursor: pointer;
+}
+
+/*--------------------------------------------------------------
+# Peer name 
+--------------------------------------------------------------*/
+
+.videoPeerName {
+    z-index: 8;
+    position: absolute;
+    padding: 10px;
+    margin: 10px;
+    bottom: 0;
+    right: 0;
+    color: #fff;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    background: var(--body-bg);
+}
+
+.videoPeerName.isPresenter::before {
+    content: '\f505';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #4caf50;
+    margin-right: 6px;
+}
+
+/*--------------------------------------------------------------
+# Video Avatar image
+--------------------------------------------------------------*/
+
+.videoAvatarImage {
+    z-index: 7;
+    position: absolute;
+    display: none;
+    width: var(--vmi-wh);
+    height: var(--vmi-wh);
+    border-radius: 50%;
+    /*center*/
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.2s ease;
+}
+
+/*--------------------------------------------------------------
+# Video 
+--------------------------------------------------------------*/
+
+.videoCircle {
+    position: absolute;
+    width: var(--vmi-wh);
+    height: var(--vmi-wh);
+    border-radius: 50%;
+    /* reliable centering - works in all scenarios */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.videoDefault {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    transition: box-shadow 0.2s ease;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--video-object-fit);
+    border-radius: 10px;
+    cursor: pointer;
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+video:hover {
+    filter: contrast(105%);
+}
+
+video:fullscreen {
+    object-fit: contain;
+}
+
+#myVideo.mirror {
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+
+.mirror {
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+}
+
+.videoCircle.mirror {
+    -webkit-transform: translate(-50%, -50%) rotateY(180deg) !important;
+    -moz-transform: translate(-50%, -50%) rotateY(180deg) !important;
+    transform: translate(-50%, -50%) rotateY(180deg) !important;
+}
+
+@keyframes show {
+    0% {
+        opacity: 0;
+        transform: scale(0.4) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

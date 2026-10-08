@@ -1,0 +1,16 @@
+{
+  "name": "mirotalk-platform",
+  "private": true,
+  "packageManager": "npm@11",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "predev": "npm run build --workspace @mirotalk/contracts",
+    "dev": "npm run dev --workspace @mirotalk/control-plane & npm run dev --workspace @mirotalk/web",
+    "build": "npm run build --workspace @mirotalk/contracts && npm run build --workspace @mirotalk/control-plane && npm run build --workspace @mirotalk/web",
+    "test": "npm run build --workspace @mirotalk/contracts && npm run test --workspaces --if-present",
+    "typecheck": "npm run build --workspace @mirotalk/contracts && npm run typecheck --workspaces --if-present"
+  }
+}

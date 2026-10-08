@@ -1,0 +1,35 @@
+# Production template. Replace example domains and source all secrets from an external secret manager.
+replicaCount: 3
+hostNetwork: true
+livekit:
+  log_level: info
+  prometheus_port: 6789
+  rtc:
+    tcp_port: 7881
+    port_range_start: 50000
+    port_range_end: 60000
+    use_external_ip: true
+  redis:
+    address: redis-ha.mirotalk.svc.cluster.local:6379
+  turn:
+    enabled: true
+    domain: turn.example.com
+    tls_port: 5349
+    udp_port: 3478
+podLabels:
+  app.kubernetes.io/part-of: mirotalk
+nodeSelector:
+  workload: livekit-media
+tolerations:
+  - key: workload
+    operator: Equal
+    value: livekit-media
+    effect: NoSchedule
+resources:
+  requests:
+    cpu: "4"
+    memory: 8Gi
+  limits:
+    cpu: "8"
+    memory: 16Gi
+terminationGracePeriodSeconds: 18000

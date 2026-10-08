@@ -1,0 +1,34 @@
+{
+  "name": "@mirotalk/control-plane",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --globals"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/swagger": "^9.5.1",
+    "@fastify/swagger-ui": "^6.1.1",
+    "@mirotalk/contracts": "0.1.0",
+    "@sinclair/typebox": "^0.34.41",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "fastify": "^5.6.1",
+    "jose": "^6.1.0",
+    "livekit-server-sdk": "^2.13.3",
+    "pg": "^8.16.3",
+    "redis": "^5.8.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.7.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
+  }
+}
